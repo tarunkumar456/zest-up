@@ -25,3 +25,7 @@ export const eventDefaultValues = {
     isFree: false,
     url: '',
 }
+export const CommentDefaultValues = {
+    title: '',
+    description: '',
+}

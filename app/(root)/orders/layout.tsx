@@ -10,12 +10,10 @@ export default function RootLayout({
 }>) {
     return (
         <div className="flex   flex-col">
-            <Header />
             <Suspense fallback={<Loading />}>
                 <main className="flex-1">{children}</main>
             </Suspense>
-            <Footer />
-
+            
         </div>
     );
 }

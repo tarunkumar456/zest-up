@@ -17,8 +17,9 @@ import {
 } from '@/components/ui/alert-dialog'
 
 import { deleteEvent } from '@/lib/actions/event.actions'
+import { deleteComment } from '@/lib/actions/comment.actions'
 
-export const DeleteConfirmation = ({ eventId }: { eventId: string }) => {
+export const DeleteConfirmation = ({ Id, type }: { Id: string, type: "event" | "comment" }) => {
   const pathname = usePathname()
   let [isPending, startTransition] = useTransition()
 
@@ -30,19 +31,21 @@ export const DeleteConfirmation = ({ eventId }: { eventId: string }) => {
 
       <AlertDialogContent className="bg-white">
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure you want to delete?</AlertDialogTitle>
+          <AlertDialogTitle>Are you sure to delete?</AlertDialogTitle>
           <AlertDialogDescription className="p-regular-16 text-grey-600">
-            This will permanently delete this event
+            {`This will permanently delete this ${type}`}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel >Cancel</AlertDialogCancel>
 
           <AlertDialogAction
+            className='bg-[#fc495b] text-primary-foreground hover:bg-[#f76a79]'
             onClick={() =>
               startTransition(async () => {
-                await deleteEvent({ eventId, path: pathname })
+                if (type == "event") await deleteEvent({ eventId: Id, path: pathname });
+                else await deleteComment({ commentId: Id, path: pathname })
               })
             }>
             {isPending ? 'Deleting...' : 'Delete'}

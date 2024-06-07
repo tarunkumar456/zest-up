@@ -25,6 +25,12 @@ export const formatDateTime = (dateString: Date) => {
     year: 'numeric', // numeric year (e.g., '2023')
     day: 'numeric', // numeric day of the month (e.g., '25')
   }
+  const onlyDateOptions: Intl.DateTimeFormatOptions = {
+    // weekday: 'short', // abbreviated weekday name (e.g., 'Mon')
+    month: 'short', // abbreviated month name (e.g., 'Oct')
+    year: 'numeric', // numeric year (e.g., '2023')
+    day: 'numeric', // numeric day of the month (e.g., '25')
+  }
 
   const timeOptions: Intl.DateTimeFormatOptions = {
     hour: 'numeric', // numeric hour (e.g., '8')
@@ -35,6 +41,7 @@ export const formatDateTime = (dateString: Date) => {
   const formattedDateTime: string = new Date(dateString).toLocaleString('en-US', dateTimeOptions)
 
   const formattedDate: string = new Date(dateString).toLocaleString('en-US', dateOptions)
+  const formattedOnlyDate: string = new Date(dateString).toLocaleString('en-US', onlyDateOptions)
 
   const formattedTime: string = new Date(dateString).toLocaleString('en-US', timeOptions)
 
@@ -42,6 +49,7 @@ export const formatDateTime = (dateString: Date) => {
     dateTime: formattedDateTime,
     dateOnly: formattedDate,
     timeOnly: formattedTime,
+    onlyDate: formattedOnlyDate
   }
 }
 

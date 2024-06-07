@@ -6,28 +6,41 @@ import React from 'react'
 import Link from 'next/link';
 import Collection from '@/components/shared/Collection';
 import CheckoutButton from '@/components/shared/CheckoutButton';
+import AddReview from '@/components/shared/AddReview';
+import { auth } from '@clerk/nextjs';
+import { getCommentByEvent } from '@/lib/actions/comment.actions';
+import { IComment } from '@/lib/database/models/comment.model';
+import ReviewCard from '@/components/shared/ReviewCard';
+import { Rating } from '@mui/material';
 
-const EventDetails = async ({params: { id }, searchParams }: SearchParamProps) => {
+
+const EventDetails = async ({ params: { id }, searchParams }: SearchParamProps) => {
 
     const event = await getEventById(id);
+    const { sessionClaims } = auth();
+    const AllComments = await getCommentByEvent({ eventId: id });
+    // console.log(AllComments)
+
+    const userId = sessionClaims?.userId as string;
     // console.log(event);
     const relatedEvents = await getRelatedEventsByCategory({
         categoryId: event.category._id,
         eventId: event._id,
         page: searchParams.page as string,
-      })
+    })
 
     return (
-        <>
+        <div>
             <section className="flex justify-center bg-[#fff3f5] bg-dotted-pattern bg-contain">
                 <div className="grid grid-cols-1 md:grid-cols-2 2xl:max-w-7xl">
-                    <Image
-                        src={event.imageUrl}
-                        alt="hero image"
-                        width={1000}
-                        height={1000}
-                        className="h-full min-h-[300px] object-cover object-center "
-                    />
+                    <div >
+                        <Image
+                            src={event.imageUrl}
+                            alt="hero image"
+                            width={1000} height={1000}
+                            className="h-full min-h-[300px] object-center "
+                        />
+                    </div>
 
                     <div className="flex w-full flex-col gap-8 p-5 md:p-10">
                         <div className="flex flex-col gap-6">
@@ -47,6 +60,17 @@ const EventDetails = async ({params: { id }, searchParams }: SearchParamProps) =
                                     by{' '}
                                     <span className="text-primary-500">{event.organizer.firstName} {event.organizer.lastName}</span>
                                 </p>
+                            </div>
+                            <div className='flex items-center gap-1'>
+                                {event.rating.toFixed(1)}
+                                <Rating
+                                    precision={0.1}
+                                    value={event.rating}
+                                    readOnly
+                                />
+                                {
+                                    `(${event.reviews} ratings)`
+                                }
                             </div>
                         </div>
 
@@ -82,8 +106,33 @@ const EventDetails = async ({params: { id }, searchParams }: SearchParamProps) =
                     </div>
                 </div>
             </section>
-            {/* EVENTS with the same category */}
             <section className="wrapper my-8 flex flex-col gap-8 md:gap-12">
+                <AddReview userId={userId} eventId={id} type="Create" />
+                <h2 className="h2-bold">Top Reviews</h2>
+                <div className='flex flex-wrap gap-6'>
+                    {
+                        (AllComments && AllComments.totalComment > 0) ?
+                            (
+                                AllComments.data.map((com: IComment, ind: number) => {
+                                    return <ReviewCard comment={com} key={ind} userId={userId} />
+                                })
+                            )
+                            :
+                            (
+                                <div className="flex-center wrapper min-h-[200px] w-full flex-col gap-3 rounded-[14px] bg-grey-50 py-28 text-center">
+                                    <h3 className="p-bold-20 md:h5-bold">No Review</h3>
+                                    <p className="p-regular-14">Be the first one to share your experience!</p>
+                                </div>
+                            )
+
+
+                    }
+                </div>
+
+
+            </section>
+            {/* EVENTS with the same category */}
+            <section className="wrapper mt-[-30px] mb-8 flex flex-col gap-8 md:gap-12">
                 <h2 className="h2-bold">Related Events</h2>
 
                 <Collection
@@ -96,7 +145,7 @@ const EventDetails = async ({params: { id }, searchParams }: SearchParamProps) =
                     totalPages={relatedEvents?.totalPages}
                 />
             </section>
-        </>
+        </div>
     )
 }
 

@@ -12,6 +12,8 @@ export interface IEvent extends Document {
   price: string;
   isFree: boolean;
   url?: string;
+  rating?: number;
+  reviews?: number;
   category: { _id: string, name: string }
   organizer: { _id: string, firstName: string, lastName: string }
 }
@@ -29,6 +31,8 @@ const EventSchema = new Schema({
   url: { type: String },
   category: { type: Schema.Types.ObjectId, ref: 'Category' },
   organizer: { type: Schema.Types.ObjectId, ref: 'User' },
+  rating: { type: Number, default: 0 },
+  reviews: { type: Number, default: 0 }
 })
 
 const Event = models.Event || model('Event', EventSchema);
